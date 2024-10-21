@@ -58,12 +58,16 @@ if uploaded_file is not None:
     else:
         st.write("No hay datos disponibles para mostrar estadísticas.")
 
-    # Conteo de Estudiantes por Nivel Educativo
-    st.subheader("Conteo de Estudiantes por Nivel Educativo")
-    if not df_filtrado.empty:
-        st.bar_chart(df_filtrado["Nivel educativo"].value_counts())
+# Conteo de Estudiantes por Nivel Educativo
+st.subheader("Conteo de Estudiantes por Nivel Educativo")
+if "Nivel educativo" in df.columns and not df_filtrado.empty:
+    conteo_niveles = df_filtrado["Nivel educativo"].value_counts()
+    if not conteo_niveles.empty:
+        st.bar_chart(conteo_niveles)
     else:
-        st.write("No hay datos disponibles para los filtros seleccionados.")
+        st.write("No hay datos para mostrar el conteo de estudiantes por nivel educativo.")
+else:
+    st.write("No hay datos disponibles para los filtros seleccionados o la columna 'Nivel educativo' no existe.")
 
     # Distribución de la Edad
     st.subheader("Distribución de la Edad")

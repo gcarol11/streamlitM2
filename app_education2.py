@@ -1,31 +1,42 @@
 import streamlit as st
 import pandas as pd
 
-st.title("Datos educativos")
+st.title("Datos Educativos")
 
+# Subida de archivo CSV
 uploaded_file = st.file_uploader("Sube un archivo CSV", type=["csv"])
 
 if uploaded_file is not None:
-
     df = pd.read_csv(uploaded_file)
 
+    # Mostrar el DataFrame original
     st.dataframe(df)
 
     st.sidebar.header("Filtros")
 
-    nivel_educativo = st.sidebar.multiselect(
-        "Nivel educativo", df["Nivel educativo"].unique()
-    )
+    # Verificación de la existencia de columnas antes de aplicar filtros
+    if "Nivel educativo" in df.columns:
+        nivel_educativo = st.sidebar.multiselect(
+            "Nivel educativo", df["Nivel educativo"].unique()
+        )
+    else:
+        nivel_educativo = []
 
-    carrera = st.sidebar.multiselect(
-        "Carrera", df["Carrera"].unique()
-    )
+    if "Carrera" in df.columns:
+        carrera = st.sidebar.multiselect(
+            "Carrera", df["Carrera"].unique()
+        )
+    else:
+        carrera = []
 
-    institucion = st.sidebar.multiselect(
-        "Institución", df["Institución"].unique()
-    )
+    if "Institución" in df.columns:
+        institucion = st.sidebar.multiselect(
+            "Institución", df["Institución"].unique()
+        )
+    else:
+        institucion = []
 
-
+    # Filtrado del DataFrame
     df_filtrado = df.copy()
 
     if nivel_educativo:
@@ -37,25 +48,28 @@ if uploaded_file is not None:
     if institucion:
         df_filtrado = df_filtrado[df_filtrado["Institución"].isin(institucion)]
 
-    
+    # Mostrar el DataFrame filtrado
     st.dataframe(df_filtrado)
 
-    
+    # Estadísticas Descriptivas
     st.subheader("Estadísticas Descriptivas")
-    st.write(df_filtrado.describe())
+    if not df_filtrado.empty:
+        st.write(df_filtrado.describe())
+    else:
+        st.write("No hay datos disponibles para mostrar estadísticas.")
 
-    
+    # Conteo de Estudiantes por Nivel Educativo
     st.subheader("Conteo de Estudiantes por Nivel Educativo")
     if not df_filtrado.empty:
         st.bar_chart(df_filtrado["Nivel educativo"].value_counts())
     else:
         st.write("No hay datos disponibles para los filtros seleccionados.")
 
-    
+    # Distribución de la Edad
     st.subheader("Distribución de la Edad")
-    if not df_filtrado.empty:
+    if "Edad" in df.columns and not df_filtrado.empty:
         st.bar_chart(df_filtrado["Edad"].value_counts(bins=10))
     else:
-        st.write("No hay datos para mostrar el histograma.")
+        st.write("No hay datos para mostrar el histograma de edad o la columna 'Edad' no existe.")
 else:
     st.write("Por favor, sube un archivo CSV.")
